@@ -1,0 +1,41 @@
+version: '3.9'
+
+services: 
+    star-wars:
+        build:
+          context: ./star-wars/.
+          dockerfile: Dockerfile
+        image: star-wars-characters-app
+        container_name: star-wars-characters-app
+        volumes:
+          - ./star-wars/.:/star-wars
+        ports: 
+            - "3000:3000"
+    
+    api:
+        build: 
+          context: ./api/.
+          dockerfile: Dockerfile
+        image: api-star-wars-characters
+        container_name: api-star-wars-characters
+        volumes:
+          - ./api/.:/usr/src/api
+          - /usr/src/api/node_modules
+        ports: 
+            - "8000:8000"
+        links:
+            - db:db
+    
+    db:
+        image: redis:6.0.1-alpine
+        command: redis-server
+        ports:
+          - "6379:6379"
+        volumes:
+          - $PWD/redis-data:/var/lib/redis
+          - $PWD/redis.conf:/usr/local/etc/redis/redis.conf
+        environment:
+          - REDIS_REPLICATION_MODE=master
+  
+    
+   
